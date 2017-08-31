@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"net/http"
 	"os"
@@ -81,6 +82,13 @@ func main() {
 		}
 		fmt.Println()
 	}
+
+	// Slot 3
+	fmt.Println("Slot 3:")
+	fmt.Println("    - Random:\t<=40")
+	fmt.Println()
+	fmt.Print("Press 'Enter' to continue...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
 func getHTML(url string) (*html.Node, error) {
