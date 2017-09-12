@@ -41,3 +41,10 @@ var runeMap = map[string]Rune{
 	"mind": Rune{ID: 558, Name: "Mind rune", Amount: 2000},
 	"body": Rune{ID: 559, Name: "Body rune", Amount: 2000},
 }
+
+// GetProfit returns the profit of using the rune given the number of viswax returned
+func (r *Rune) GetProfit(count int) int {
+	viswaxPrice := count * jsonNumberToInt(viswax.Current.Price)
+	runePrice := r.Amount * jsonNumberToInt(r.Item.Current.Price)
+	return viswaxPrice - runePrice
+}
