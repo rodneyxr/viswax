@@ -82,10 +82,7 @@ func getCombinations() (*CombinationInfo, error) {
 		return nil, err
 	}
 
-	re, err := regexp.Compile(`Combination\s*for\s*(\w+).*?(\d+)\w*;?`)
-	if err != nil {
-		return nil, err
-	}
+	re := regexp.MustCompile(`Combination\s*for\s*(\w+).*?(\d+)\w*;?`)
 	res := re.FindStringSubmatch(post)
 
 	combos.DayOfWeek = res[1]
@@ -94,10 +91,7 @@ func getCombinations() (*CombinationInfo, error) {
 		return nil, err
 	}
 
-	re, err = regexp.Compile(`-\s*(\w+)|(\w+\*?)\s*(\d+)`)
-	if err != nil {
-		return nil, err
-	}
+	re = regexp.MustCompile(`-\s*(\w+)|(\w+\*?)\s*(\d+)`)
 	groups := re.FindAllStringSubmatch(post, -1)
 
 	slot := 0
@@ -169,7 +163,7 @@ func getCombinations() (*CombinationInfo, error) {
 
 func getPost() (string, error) {
 	// Get the forum page
-	root, err := getHTML(`http://services.runescape.com/m=forum/forums.ws?75,76,387,65763383`)
+	root, err := getHTML(`http://services.runescape.com/m=forum/forums.ws?75,76,331,66006366`)
 	if err != nil {
 		return "", err
 	}
@@ -182,6 +176,6 @@ func getPost() (string, error) {
 		return "", err
 	}
 
-	// Second post is the combinations post
-	return scrape.Text(nodes[1]), nil
+	// First post is the combinations post
+	return scrape.Text(nodes[0]), nil
 }
