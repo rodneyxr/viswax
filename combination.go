@@ -82,6 +82,8 @@ func getCombinations() (*CombinationInfo, error) {
 		return nil, err
 	}
 
+	// Find the start of the combinations in the post
+	// (Ex: Combination for Wednesday the 19th)
 	re := regexp.MustCompile(`Combination\s*for\s*(\w+).*?(\d+)\w*;?`)
 	res := re.FindStringSubmatch(post)
 
@@ -91,31 +93,39 @@ func getCombinations() (*CombinationInfo, error) {
 		return nil, err
 	}
 
+	// Define regex for a combination group or slot label
+	// Ex: "Air(earth 29)" or "Slot 1"
 	re = regexp.MustCompile(`-\s*(\w+)|(\w+\*?)\s*(\d+)`)
 	groups := re.FindAllStringSubmatch(post, -1)
 
+	// Start with slot 0 and loop through each group. Each time a slot label
+	// is found, increment the slot counter.
 	slot := 0
 	for _, group := range groups {
-		var rune string
+		var runeName string
 		var count int
+
+		// hasCount is true if there is more than one rune in the group
 		hasCount := group[3] != ""
 
 		if hasCount {
-			rune = strings.ToLower(group[2])
+			runeName = strings.ToLower(group[2])
 			if count, err = strconv.Atoi(group[3]); err != nil {
 				return nil, err
 			}
 		} else {
-			rune = strings.ToLower(group[1])
+			runeName = strings.ToLower(group[1])
 		}
 
 		if slot == 0 {
-			if rune == "slot" {
+			// Slot 1
+			if runeName == "slot" {
 				slot = 1
 				continue
 			}
 		} else if slot == 1 {
-			if rune == "slot" {
+			// Slot 2
+			if runeName == "slot" {
 				slot = 2
 				continue
 			}
@@ -126,10 +136,10 @@ func getCombinations() (*CombinationInfo, error) {
 				combos.Slot1 = append(combos.Slot1, SlotGroup{})
 			}
 			i := len(combos.Slot1) - 1
-			key := strings.TrimRight(rune, "*")
+			key := strings.TrimRight(runeName, "*")
 			key = strings.ToLower(key)
 			slotToAdd := Slot{
-				RuneName: rune,
+				RuneName: runeName,
 				Count:    count,
 				Rune:     runeMap[key],
 			}
@@ -137,7 +147,9 @@ func getCombinations() (*CombinationInfo, error) {
 			combos.Slot1[i].Group = append(combos.Slot1[i].Group, slotToAdd)
 
 		} else if slot == 2 {
-			if rune == "slot" {
+			// If the word "slot" or "is" is found, we found the "slot 3" label
+			// or it is missing.
+			if runeName == "slot" || runeName == "is" {
 				break
 			}
 			if !hasCount {
@@ -147,10 +159,10 @@ func getCombinations() (*CombinationInfo, error) {
 				combos.Slot2 = append(combos.Slot2, SlotGroup{})
 			}
 			i := len(combos.Slot2) - 1
-			key := strings.TrimRight(rune, "*")
+			key := strings.TrimRight(runeName, "*")
 			key = strings.ToLower(key)
 			slotToAdd := Slot{
-				RuneName: rune,
+				RuneName: runeName,
 				Count:    count,
 				Rune:     runeMap[key],
 			}
