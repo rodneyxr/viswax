@@ -10,6 +10,9 @@ import (
 
 // http://services.runescape.com/m=itemdb_rs/api/catalogue/detail.json?item=21787
 func main() {
+	// Prompt the user that the program is working...
+	fmt.Println("fetching prices...")
+	fmt.Println()
 
 	// Get the prices and profits for all runes
 	prices := make(map[Rune]int)

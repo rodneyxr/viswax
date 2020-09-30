@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -27,7 +26,7 @@ type Item struct {
 // Price holds the price and trend of the item
 type Price struct {
 	Trend string      `json:"trend"`
-	Price json.Number `json:"price,Number"`
+	Price interface{} `json:"price,string"`
 }
 
 func getItem(id int) Item {

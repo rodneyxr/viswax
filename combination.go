@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
@@ -34,11 +33,24 @@ type Slot struct {
 	Rune     Rune
 }
 
-func jsonNumberToInt(number json.Number) int {
-	sPrice := number.String()
+// runescapePriceToInt will convert a runescape api json price result to the number of coins.
+// This is necessary because the api returns the result with a common and sometimes K, M, etc...
+func runescapePriceToInt(price interface{}) int {
+	factor := 1
+	sPrice := fmt.Sprintf("%v", price)
 	sPrice = strings.Replace(sPrice, ",", "", -1)
-	price, _ := strconv.Atoi(sPrice)
-	return price
+
+	// Check if price has 'k'
+	if strings.HasSuffix(sPrice, "k") {
+		sPrice = strings.Replace(sPrice, "k", "", -1)
+		factor = 1000
+	}
+
+	fprice, err := strconv.ParseFloat(sPrice, 64)
+	if err != nil {
+		panic("failed to convert " + sPrice + ": " + err.Error())
+	}
+	return int(fprice) * factor
 }
 
 func (c *CombinationInfo) String() string {
@@ -52,7 +64,7 @@ func (c *CombinationInfo) String() string {
 	for i, group := range c.Slot1 {
 		sb.WriteString(fmt.Sprintf("  Group %d:\n", i+1))
 		for _, slot := range group.Group {
-			profit := (slot.Count*jsonNumberToInt(viswax.Current.Price) - slot.Rune.Amount*jsonNumberToInt(slot.Rune.Item.Current.Price)) / 1000
+			profit := (slot.Count*runescapePriceToInt(viswax.Current.Price) - slot.Rune.Amount*runescapePriceToInt(slot.Rune.Item.Current.Price)) / 1000
 			sb.WriteString(fmt.Sprintf("    - %s:\t%d%10dK\n", strings.Title(slot.RuneName), slot.Count, profit))
 		}
 		sb.WriteRune('\n')
@@ -63,7 +75,7 @@ func (c *CombinationInfo) String() string {
 	for i, group := range c.Slot2 {
 		sb.WriteString(fmt.Sprintf("  Group %d:\n", i+1))
 		for _, slot := range group.Group {
-			profit := (slot.Count*jsonNumberToInt(viswax.Current.Price) - slot.Rune.Amount*jsonNumberToInt(slot.Rune.Item.Current.Price)) / 1000
+			profit := (slot.Count*runescapePriceToInt(viswax.Current.Price) - slot.Rune.Amount*runescapePriceToInt(slot.Rune.Item.Current.Price)) / 1000
 			sb.WriteString(fmt.Sprintf("    - %s:\t%d%10dK\n", strings.Title(slot.RuneName), slot.Count, profit))
 		}
 		sb.WriteRune('\n')
