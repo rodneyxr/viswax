@@ -10,6 +10,13 @@ https://github.com/rodneyxr/viswax/releases
 * The slots for group 1 and group 2
 * Each rune in a group displays the number of points for using that rune followed by the profit gain/loss
 
+## Quickstart
+Install and run if you have Go installed on your machine.
+```
+go install github.com/rodneyxr/viswax@latest
+viswax
+```
+
 Running viswax.exe
 ```
 Vis Wax for Saturday 19
